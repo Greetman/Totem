@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import '../widgets/glass_container.dart';
 
 class ProfilePage extends StatefulWidget {
-  const ProfilePage({super.key});
+  final VoidCallback? onSignOut;
+
+  const ProfilePage({super.key, this.onSignOut});
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
@@ -185,15 +187,65 @@ class _ProfilePageState extends State<ProfilePage> {
 
           const SizedBox(height: 12),
 
-          Align(
-            alignment: Alignment.centerRight,
-            child: ElevatedButton(
-              onPressed: _editProfile,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white.withOpacity(0.06),
+          Row(
+            children: [
+              if (widget.onSignOut != null)
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () {
+                      // Show confirmation dialog
+                      showDialog(
+                        context: context,
+                        builder: (ctx) => AlertDialog(
+                          backgroundColor: Colors.black,
+                          title: const Text(
+                            'Sign Out',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          content: const Text(
+                            'Are you sure you want to sign out?',
+                            style: TextStyle(color: Colors.white70),
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.of(ctx).pop(),
+                              child: const Text(
+                                'Cancel',
+                                style: TextStyle(color: Colors.white70),
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(ctx).pop();
+                                widget.onSignOut!();
+                              },
+                              child: const Text(
+                                'Sign Out',
+                                style: TextStyle(color: Colors.red),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.red,
+                      side: const BorderSide(color: Colors.red),
+                    ),
+                    child: const Text('Sign Out'),
+                  ),
+                ),
+              if (widget.onSignOut != null) const SizedBox(width: 12),
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: _editProfile,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white.withOpacity(0.06),
+                  ),
+                  child: const Text('Edit profile'),
+                ),
               ),
-              child: const Text('Edit profile'),
-            ),
+            ],
           ),
         ],
       ),
