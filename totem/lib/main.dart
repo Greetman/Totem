@@ -8,6 +8,7 @@ import 'pages/leaderboard_page.dart';
 import 'pages/clan_page.dart';
 import 'pages/profile_page.dart';
 import 'pages/loading_page.dart';
+import 'pages/sign_in_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -22,10 +23,23 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   bool _isLoading = true;
+  bool _isSignedIn = false;
 
   void _onLoadingComplete() {
     setState(() {
       _isLoading = false;
+    });
+  }
+
+  void _onSignInSuccess() {
+    setState(() {
+      _isSignedIn = true;
+    });
+  }
+
+  void _onSignOut() {
+    setState(() {
+      _isSignedIn = false;
     });
   }
 
@@ -44,7 +58,9 @@ class _MyAppState extends State<MyApp> {
       ),
       home: _isLoading
           ? LoadingPage(onLoadingComplete: _onLoadingComplete)
-          : const MainPage(),
+          : _isSignedIn
+              ? MainPage(onSignOut: _onSignOut)
+              : SignInPage(onSignInSuccess: _onSignInSuccess),
     );
   }
 }
@@ -52,7 +68,9 @@ class _MyAppState extends State<MyApp> {
 // GlassContainer moved to lib/widgets/glass_container.dart
 
 class MainPage extends StatefulWidget {
-  const MainPage({super.key});
+  final VoidCallback onSignOut;
+
+  const MainPage({super.key, required this.onSignOut});
 
   @override
   State<MainPage> createState() => _MainPageState();
@@ -343,7 +361,7 @@ class _MainPageState extends State<MainPage> {
                             ),
                           ],
                         ),
-                        const Expanded(child: ProfilePage()),
+                        Expanded(child: ProfilePage(onSignOut: widget.onSignOut)),
                       ],
                     ),
                   ),
